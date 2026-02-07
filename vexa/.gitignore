@@ -1,5 +1,0 @@
-# Secrets (API key, state) — never commit or publish to ClawHub
-secrets/
-
-# macOS
-.DS_Store
