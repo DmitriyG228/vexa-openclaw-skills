@@ -1,6 +1,6 @@
 ---
 name: vexa
-description: "Send bots to Zoom, Google Meet, and Microsoft Teams meetings. Get live transcripts, recordings, and reports. Self-hosted or cloud — no external API needed."
+description: "Send bots to Zoom, Google Meet, and Microsoft Teams meetings. Get live transcripts, recordings, and reports. Works with Vexa Cloud or your own self-hosted instance."
 ---
 
 ## Chat-oriented interactions
@@ -19,9 +19,14 @@ Use the bundled CLI:
 
 ## Environment
 
-Set for the OpenClaw process (or shell):
-- `VEXA_API_KEY` (required)
-- `VEXA_BASE_URL` (optional env override — takes priority over endpoint config)
+**Required:** `VEXA_API_KEY` — get yours from https://vexa.ai/dashboard/api-keys
+
+Set `VEXA_API_KEY` in your environment or create `skills/vexa/secrets/vexa.env` manually with:
+```
+VEXA_API_KEY=your_key_here
+```
+
+Optional: `VEXA_BASE_URL` (env override — takes priority over endpoint config)
 
 ### Endpoint switching (prod / local dev)
 
@@ -44,7 +49,7 @@ Priority: `VEXA_BASE_URL` env var > `vexa-endpoints.json` active endpoint > defa
 
 **Webhook — proactive setup:** Whenever secrets exist and you're working with Vexa, run `node skills/vexa/scripts/onboard.mjs --check-webhook`. If `webhook_configured` is false, advise adding the vexa mapping (see `references/webhook-setup.md`). For onboarding-only details (webhook requirements, pipeline validation, mock webhook), load `references/onboarding-flow.md`.
 
-**When secrets are missing:** Ask them to get their key from https://vexa.ai/dashboard/api-keys and paste it in chat — you write it to `skills/vexa/secrets/vexa.env`. Alternatively, share the path and format so they can add it manually (better for security if they prefer not to paste the key).
+**When secrets are missing:** Direct the user to get their key from https://vexa.ai/dashboard/api-keys and set it up themselves. They should either set `VEXA_API_KEY` in their environment or create `skills/vexa/secrets/vexa.env` manually with `VEXA_API_KEY=their_key_here`. Do not ask users to paste API keys in chat.
 
 **Secrets location:** `skills/vexa/secrets/` holds env files and `vexa-state.json`. This dir is gitignored. When publishing the skill to ClawHub, ensure `secrets/` is excluded.
 
@@ -150,9 +155,9 @@ Options:
 - `--download-urls` — resolve download URLs for each recording media file
 - `--ttl_seconds 3600` — share link TTL
 
-## Webhook (meeting finished → report)
+## Webhook (meeting finished → report) — optional
 
-When Vexa sends a "meeting finished" webhook, the transform (`scripts/vexa-transform.mjs`) instructs the agent to create a report. See `references/webhook-setup.md` for hooks mapping config. Requires `hooks.transformsDir` = workspace root and `transform.module` = `skills/vexa/scripts/vexa-transform.mjs`.
+Optionally, Vexa can POST a "meeting finished" webhook to trigger automatic report creation. This requires the user to manually configure their `openclaw.json` — see `references/webhook-setup.md` for the hooks mapping config. The skill does NOT modify `openclaw.json` automatically. Users who want this feature add `hooks.transformsDir` and the vexa mapping to their config themselves.
 
 ## OpenClaw ingestion helpers
 
